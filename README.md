@@ -4,11 +4,12 @@ A Linux CLI addon manager for World of Warcraft
 
 ### DESIGN
 
-* go
+* go 1.22.2
 * cli based
 
 ### Libraries
-* [cobra](https://github.com/spf13/cobra)
+* [cobra 1.8.1](https://github.com/spf13/cobra)
+* [viper 1.8.1](https://github.com/spf13/viper)
 
 ### Cobra application path
 /home/justin/projects/worc

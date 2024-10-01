@@ -1,61 +1,104 @@
 package addon
 
-import {
+import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
-}
+	"regexp"
+)
 
 var (
-	default_path = "/home/justin/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/"
+	defaultPath = "/home/justin/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/"
 )
+
+type Addon struct {
+	AddonPath string
+	Name      string
+	Version   string
+}
 
 func CheckAddonPath(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		return false
 	}
-	fmt.Println("Game directory found at: ", path)
+	fmt.Println("Game directory found at:", path)
 	return info.IsDir()
 }
 
 func CheckGameVersionRetail() bool {
-	file_path := default_path + "_retail_/Wow.exe"
-	info, err := os.Stat(file_path)
+	filePath := filepath.Join(defaultPath, "_retail_", "Wow.exe")
+	_, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
 		return false
 	}
-	fmt.Println("Retail version found at: ", file_path)
-	return info.IsDir()
+	fmt.Println("Retail version found at:", filePath)
+	return true
 }
 
-func CreateAddonPath() {
-	interface_path := default_path + "_retail_/Interface"
-	err := os.Mkdir(interface_path, 0750)
-	if err != nil && !os.IsExist(err) {
-		fmt.Println(err)
-		os.Exit(1)
+func CreateAddonPath() error {
+	interfacePath := filepath.Join(defaultPath, "_retail_", "Interface")
+	addonPath := filepath.Join(interfacePath, "Addons")
+	
+	if err := os.MkdirAll(addonPath, 0750); err != nil {
+		return fmt.Errorf("failed to create addon path: %w", err)
 	}
-
-	addon_path := interface_path + "/Addons/"
-	err = os.Mkdir(addon_path, 0750)
-	if err != nil && !os.IsExist(err) {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	return nil
 }
 
-func LoadAddons() ([]string, error) {
-	var dirs []string
-	addon_path := default_path + "_retail_/Interface/Addons/"
-	entries, err := os.ReadDir(addon_path)
+func LoadAddons() ([]Addon, error) {
+	var addons []Addon
+	addonPath := filepath.Join(defaultPath, "_retail_", "Interface", "Addons")
+	entries, err := os.ReadDir(addonPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read addon directory: %w", err)
 	}
+	
 	for _, entry := range entries {
 		if entry.IsDir() {
-			dirs = append(dirs, filepath.Join(addon_path, entry.Name()))
+			fullPath := filepath.Join(addonPath, entry.Name())
+			versionNumber := FindVersion(fullPath)
+			addonName := FindName(fullPath)
+			addon := Addon{
+				AddonPath: fullPath,
+				Version:   versionNumber,
+				Name:      addonName,
+			}
+			addons = append(addons, addon)
 		}
 	}
-	return dirs, nil
+	return addons, nil
+}
+
+func FindVersion(path string) string {
+	return findInFile(path, `^## Version: (.+)`)
+}
+
+func FindName(path string) string {
+	return findInFile(path, `^## Title: (.+)`)
+}
+
+func findInFile(path, pattern string) string {
+	file, err := os.Open(filepath.Join(path, filepath.Base(path)+".toc"))
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return ""
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	regex := regexp.MustCompile(pattern)
+	
+	for scanner.Scan() {
+		matches := regex.FindStringSubmatch(scanner.Text())
+		if len(matches) > 1 {
+			return matches[1]
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error scanning file:", err)
+	}
+	return ""
 }

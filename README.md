@@ -18,3 +18,10 @@ A Linux CLI addon manager for World of Warcraft
 
 ### Requirements
 * Battle.net launcher installed through [Lutris](https://lutris.net/)
+
+### Install
+* clone this repository
+* go build
+* edit your .bashrc or zshrc with:
+    * alias worc=<path-to-worc>
+    * ex: alias worc='~/projects/worc/worc'

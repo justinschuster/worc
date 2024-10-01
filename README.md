@@ -11,5 +11,10 @@ A Linux CLI addon manager for World of Warcraft
 * [cobra 1.8.1](https://github.com/spf13/cobra)
 * [viper 1.8.1](https://github.com/spf13/viper)
 
-### Cobra application path
-/home/justin/projects/worc
+### Application paths
+* cobra: /home/justin/projects/worc/
+* battle.net: ~/Games/battlenet/
+* wow: ~/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/
+
+### Requirements
+* Battle.net launcher installed through [Lutris](https://lutris.net/)

@@ -13,7 +13,9 @@ import (
 	//"github.com/spf13/viper"
 )
 
-
+var (
+	default_path = "/home/justin/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/"
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -26,12 +28,32 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) { },
 }
 
+func CheckAddonPath() bool {
+	info, err := os.Stat(default_path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	fmt.Println("Game directory found at: ", default_path)
+	return info.IsDir()
+}
+
+func CheckGameExists() bool {
+	file_path := default_path + "_retail_/Wow.exe"
+	info, err := os.Stat(file_path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	fmt.Println("Retail version found at: ", file_path)
+	return info.IsDir()
+}
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
-	if err != nil {
-		fmt.Println("Hello")
+	if err != nil {	
+		CheckAddonPath()
+		CheckGameExists()
 		os.Exit(1)
 	}
 }

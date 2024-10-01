@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/justinschuster/internal/addon"
+	"github.com/justinschuster/worc/internal/addon"
 	"github.com/spf13/cobra"
 	//"github.com/spf13/viper"
 )

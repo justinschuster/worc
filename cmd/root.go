@@ -1,6 +1,5 @@
 /*
 Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -43,7 +42,8 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Println("\nListing Addons:\n")
+		fmt.Println("\nListing Addons:")
+		fmt.Println()
 		for _, addonValue := range addons {
 			fmt.Println("Name: ", addonValue.Name)
 			fmt.Println("Version: ", addonValue.Version)
